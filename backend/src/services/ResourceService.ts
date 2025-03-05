@@ -35,6 +35,35 @@ export class ResourceService {
         FOREIGN KEY(id) REFERENCES resources(id)
       );
     `);
+
+    // Add seed data if tables are empty
+    const resourceCount = await this.db!.get(
+      "SELECT COUNT(*) as count FROM resources"
+    );
+    if (resourceCount.count === 0) {
+      // Seed books
+      await this.db!.exec(`
+        INSERT INTO resources (id, type, state) VALUES 
+          ('book-001', 'book', 'available'),
+          ('book-002', 'book', 'available'),
+          ('book-003', 'book', 'borrowed');
+          
+        INSERT INTO books (id, title, author, genre) VALUES 
+          ('book-001', 'Clean Code', 'Robert C. Martin', 'Programming'),
+          ('book-002', 'Design Patterns', 'Erich Gamma', 'Programming'),
+          ('book-003', 'The Pragmatic Programmer', 'Andrew Hunt', 'Programming');
+          
+        INSERT INTO resources (id, type, state) VALUES 
+          ('laptop-001', 'laptop', 'available'),
+          ('laptop-002', 'laptop', 'borrowed');
+          
+        INSERT INTO laptops (id, brand, model) VALUES 
+          ('laptop-001', 'Apple', 'MacBook Pro M2'),
+          ('laptop-002', 'Dell', 'XPS 13');
+      `);
+
+      console.log("Resource seed data added successfully");
+    }
   }
 
   // Resource Management

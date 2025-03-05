@@ -25,7 +25,62 @@ export class LoanService {
         FOREIGN KEY(resource_id) REFERENCES resources(id),
         FOREIGN KEY(user_id) REFERENCES users(id)
       );
+      
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        type TEXT NOT NULL
+      );
     `);
+
+    // Add seed data if tables are empty
+    const userCount = await this.db!.get("SELECT COUNT(*) as count FROM users");
+    if (userCount.count === 0) {
+      // Seed users
+      await this.db!.exec(`
+        INSERT INTO users (id, name, email, type) VALUES 
+          ('user-001', 'John Smith', 'john@example.com', 'teacher'),
+          ('user-002', 'Jane Doe', 'jane@example.com', 'student'),
+          ('user-003', 'Bob Johnson', 'bob@example.com', 'student');
+      `);
+
+      console.log("User seed data added successfully");
+    }
+
+    const loanCount = await this.db!.get("SELECT COUNT(*) as count FROM loans");
+    if (loanCount.count === 0) {
+      // Get current date for calculations
+      const now = new Date();
+
+      // Past loan (ended yesterday)
+      const pastLoanEnd = new Date(now);
+      pastLoanEnd.setDate(pastLoanEnd.getDate() - 1);
+      const pastLoanStart = new Date(pastLoanEnd);
+      pastLoanStart.setDate(pastLoanStart.getDate() - 7);
+
+      // Current loan (ends in 6 days)
+      const currentLoanStart = new Date(now);
+      currentLoanStart.setDate(currentLoanStart.getDate() - 1);
+      const currentLoanEnd = new Date(now);
+      currentLoanEnd.setDate(currentLoanEnd.getDate() + 6);
+
+      // Overdue loan (should have ended 3 days ago)
+      const overdueLoanStart = new Date(now);
+      overdueLoanStart.setDate(overdueLoanStart.getDate() - 10);
+      const overdueLoanEnd = new Date(now);
+      overdueLoanEnd.setDate(overdueLoanEnd.getDate() - 3);
+
+      // Seed loans
+      await this.db!.exec(`
+        INSERT INTO loans (id, resource_id, user_id, start_date, end_date) VALUES 
+          ('loan-001', 'book-001', 'user-001', '${pastLoanStart.toISOString()}', '${pastLoanEnd.toISOString()}'),
+          ('loan-002', 'book-003', 'user-002', '${currentLoanStart.toISOString()}', '${currentLoanEnd.toISOString()}'),
+          ('loan-003', 'laptop-002', 'user-001', '${overdueLoanStart.toISOString()}', '${overdueLoanEnd.toISOString()}');
+      `);
+
+      console.log("Loan seed data added successfully");
+    }
   }
 
   async createLoan(
