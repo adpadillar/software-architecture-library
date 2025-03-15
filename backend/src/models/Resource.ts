@@ -4,8 +4,8 @@ export class Resource {
   private id: string;
   private state: State;
 
-  constructor(state: State) {
-    this.id = crypto.randomUUID();
+  constructor(state: State, id: string) {
+    this.id = id;
     this.state = state;
   }
 
@@ -35,8 +35,8 @@ export class Laptop extends Resource {
   private brand: string;
   private model: string;
 
-  constructor(brand: string, model: string, state: State) {
-    super(state);
+  constructor(brand: string, model: string, state: State, id: string) {
+    super(state, id);
     this.brand = brand;
     this.model = model;
   }
@@ -55,8 +55,14 @@ export class Book extends Resource {
   private author: string;
   private genre: string;
 
-  constructor(title: string, author: string, genre: string, state: State) {
-    super(state);
+  constructor(
+    title: string,
+    author: string,
+    genre: string,
+    state: State,
+    id: string
+  ) {
+    super(state, id);
     this.title = title;
     this.author = author;
     this.genre = genre;

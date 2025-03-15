@@ -79,9 +79,15 @@ export class ResourceService {
     return this.mapToResource(resource);
   }
 
-  async updateResourceState(id: string, state: "available" | "borrowed"): Promise<void> {
+  async updateResourceState(
+    id: string,
+    state: "available" | "borrowed"
+  ): Promise<void> {
     await this.initDb();
-    await this.db!.run("UPDATE resources SET state = ? WHERE id = ?", [state, id]);
+    await this.db!.run("UPDATE resources SET state = ? WHERE id = ?", [
+      state,
+      id,
+    ]);
   }
 
   async deleteResource(id: string): Promise<void> {
@@ -136,7 +142,7 @@ export class ResourceService {
       [id]
     );
     return book
-      ? new Book(book.title, book.author, book.genre, book.state)
+      ? new Book(book.title, book.author, book.genre, book.state, book.id)
       : null;
   }
 
@@ -148,7 +154,9 @@ export class ResourceService {
       JOIN books b ON r.id = b.id 
       WHERE r.type = 'book'
     `);
-    return books.map((b) => new Book(b.title, b.author, b.genre, b.state));
+    return books.map(
+      (b) => new Book(b.title, b.author, b.genre, b.state, b.id)
+    );
   }
 
   async searchBooksByTitle(title: string): Promise<Book[]> {
@@ -162,7 +170,9 @@ export class ResourceService {
     `,
       [`%${title}%`]
     );
-    return books.map((b) => new Book(b.title, b.author, b.genre, b.state));
+    return books.map(
+      (b) => new Book(b.title, b.author, b.genre, b.state, b.id)
+    );
   }
 
   async searchBooksByAuthor(author: string): Promise<Book[]> {
@@ -176,7 +186,9 @@ export class ResourceService {
     `,
       [`%${author}%`]
     );
-    return books.map((b) => new Book(b.title, b.author, b.genre, b.state));
+    return books.map(
+      (b) => new Book(b.title, b.author, b.genre, b.state, b.id)
+    );
   }
 
   async searchBooksByGenre(genre: string): Promise<Book[]> {
@@ -190,7 +202,9 @@ export class ResourceService {
     `,
       [`%${genre}%`]
     );
-    return books.map((b) => new Book(b.title, b.author, b.genre, b.state));
+    return books.map(
+      (b) => new Book(b.title, b.author, b.genre, b.state, b.id)
+    );
   }
 
   // Laptop Management
@@ -221,7 +235,7 @@ export class ResourceService {
       JOIN laptops l ON r.id = l.id 
       WHERE r.type = 'laptop'
     `);
-    return laptops.map((l) => new Laptop(l.brand, l.model, l.state));
+    return laptops.map((l) => new Laptop(l.brand, l.model, l.state, l.id));
   }
 
   async getAvailableLaptops(): Promise<Laptop[]> {
@@ -232,7 +246,7 @@ export class ResourceService {
       JOIN laptops l ON r.id = l.id 
       WHERE r.type = 'laptop' AND r.state = 'available'
     `);
-    return laptops.map((l) => new Laptop(l.brand, l.model, l.state));
+    return laptops.map((l) => new Laptop(l.brand, l.model, l.state, l.id));
   }
 
   private async mapToResource(resource: any): Promise<Book | Laptop> {
@@ -244,7 +258,8 @@ export class ResourceService {
         book.title,
         book.author,
         book.genre,
-        resource.state // Pasar el estado correctamente
+        resource.state, // Pasar el estado correctamente,
+        resource.id // Agregar el id
       );
     } else {
       const laptop = await this.db!.get("SELECT * FROM laptops WHERE id = ?", [
@@ -253,7 +268,8 @@ export class ResourceService {
       return new Laptop(
         laptop.brand,
         laptop.model,
-        resource.state // Pasar el estado correctamente
+        resource.state, // Pasar el estado correctamente
+        resource.id // Agregar el id
       );
     }
   }

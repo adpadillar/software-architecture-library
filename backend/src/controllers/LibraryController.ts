@@ -18,36 +18,40 @@ export class LibraryController {
     await this.resourceService.updateResourceState(bookId, state);
   }
 
-  async updateResourceState(resourceId: string, state: "available" | "borrowed") {
+  async updateResourceState(
+    resourceId: string,
+    state: "available" | "borrowed"
+  ) {
     await this.resourceService.updateResourceState(resourceId, state);
   }
 
   async loanBook(bookId: string, user: Student | Teacher) {
     const book = await this.resourceService.findBook(bookId);
-    
+
     if (!book || book.getState() !== "available") {
       throw new Error("El libro no está disponible");
     }
-  
+
     // Calcular fechas de préstamo
     const startDate = new Date();
     const endDate = new Date();
     endDate.setDate(startDate.getDate() + 7); // Préstamo por 7 días
-  
+
     await this.resourceService.updateResourceState(bookId, "borrowed");
-    
+
     // Usar createLoan con las fechas calculadas
-    await this.loanService.createLoan(
-      book,
-      user,
-      startDate,
-      endDate
-    );
+    await this.loanService.createLoan(book, user, startDate, endDate);
   }
 
   // Book Management
   async addBook(title: string, author: string, genre: string): Promise<Book> {
-    const book = new Book(title, author, genre, "available");
+    const book = new Book(
+      title,
+      author,
+      genre,
+      "available",
+      crypto.randomUUID()
+    );
     await this.resourceService.addBook(book);
     return book;
   }
@@ -74,7 +78,7 @@ export class LibraryController {
 
   // Laptop Management
   async addLaptop(brand: string, model: string): Promise<Laptop> {
-    const laptop = new Laptop(brand, model, "available");
+    const laptop = new Laptop(brand, model, "available", crypto.randomUUID());
     await this.resourceService.addLaptop(laptop);
     return laptop;
   }
