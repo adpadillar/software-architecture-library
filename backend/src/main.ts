@@ -53,6 +53,7 @@ async function startServer() {
       console.log(`Server running on http://localhost:${PORT}`);
       console.log(
         `API documentation available at http://localhost:${PORT}/api/docs`
+        
       );
     });
   } catch (error) {

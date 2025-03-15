@@ -46,12 +46,14 @@ export class ResourceService {
         INSERT INTO resources (id, type, state) VALUES 
           ('book-001', 'book', 'available'),
           ('book-002', 'book', 'available'),
-          ('book-003', 'book', 'borrowed');
+          ('book-003', 'book', 'available'),
+          ('book-004', 'book', 'available');
           
         INSERT INTO books (id, title, author, genre) VALUES 
           ('book-001', 'Clean Code', 'Robert C. Martin', 'Programming'),
           ('book-002', 'Design Patterns', 'Erich Gamma', 'Programming'),
-          ('book-003', 'The Pragmatic Programmer', 'Andrew Hunt', 'Programming');
+          ('book-003', 'The Pragmatic Programmer', 'Andrew Hunt', 'Programming'),
+          ('book-004', 'Lord of the Rings', 'Jorge', 'Cience Fiction');
           
         INSERT INTO resources (id, type, state) VALUES 
           ('laptop-001', 'laptop', 'available'),
@@ -63,6 +65,7 @@ export class ResourceService {
       `);
 
       console.log("Resource seed data added successfully");
+
     }
   }
 
