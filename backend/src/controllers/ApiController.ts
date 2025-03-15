@@ -6,6 +6,18 @@ import { DocsService } from "../services/DocsService";
 export const apiRouter = express.Router();
 const libraryController = new LibraryController();
 
+
+// Agregar nuevo endpoint para cambiar estado
+apiRouter.put("/books/:id/state", async (req: Request, res: Response) => {
+  try {
+    const { state } = req.body;
+    await libraryController.updateBookState(req.params.id, state);
+    res.json({ message: "Estado actualizado exitosamente" });
+  } catch (error) {
+    res.status(400).json({ error: String(error) });
+  }
+});
+
 // Documentation endpoint
 apiRouter.get("/docs", async (_req: Request, res: Response) => {
   try {
@@ -96,16 +108,14 @@ apiRouter.post("/laptops", async (req: Request, res: Response) => {
   }
 });
 
-// Loan endpoints
+// Loan endpoints - Modificamos solo el de books
 apiRouter.post("/loans/books", async (req: Request, res: Response) => {
   try {
-    const { bookId, userId, userType } = req.body;
-    const user =
-      userType === "teacher"
-        ? new Teacher(userId, "name@example.com")
-        : new Student(userId, "name@example.com");
-
-    await libraryController.loanBook(bookId, user);
+    const { bookId } = req.body; // Solo necesitamos el bookId ahora
+    
+    // Lógica simplificada: solo cambiamos el estado
+    await libraryController.updateResourceState(bookId, "borrowed");
+    
     res.status(201).json({ message: "Book loaned successfully" });
   } catch (error) {
     res.status(400).json({ error: String(error) });
@@ -150,10 +160,10 @@ apiRouter.get("/loans/user/:userId", async (req: Request, res: Response) => {
   }
 });
 
-// Resource endpoints
+// Resource endpoints - Modificamos el return
 apiRouter.post("/resources/:id/return", async (req: Request, res: Response) => {
   try {
-    await libraryController.returnResource(req.params.id);
+    await libraryController.updateResourceState(req.params.id, "available");
     res.json({ message: "Resource returned successfully" });
   } catch (error) {
     res.status(400).json({ error: String(error) });

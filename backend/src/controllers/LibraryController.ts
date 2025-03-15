@@ -2,6 +2,7 @@ import { Book, Laptop } from "../models/Resource";
 import { User } from "../models/User";
 import { ResourceService } from "../services/ResourceService";
 import { LoanService } from "../services/LoanService";
+import { Student, Teacher } from "../models/User";
 
 export class LibraryController {
   private resourceService: ResourceService;
@@ -12,22 +13,35 @@ export class LibraryController {
     this.loanService = new LoanService();
   }
 
-  async loanBook(book: Book, user: User): Promise<void> {
-    const bookExists = await this.resourceService.findBook(book.getId());
-    if (!bookExists) {
-      throw new Error("Book not found in the library");
-    }
+  // Método nuevo y único necesario------------------------------------------------
+  async updateBookState(bookId: string, state: "available" | "borrowed") {
+    await this.resourceService.updateResourceState(bookId, state);
+  }
 
-    if (!bookExists.isAvailable()) {
-      throw new Error("Book is not available");
-    }
+  async updateResourceState(resourceId: string, state: "available" | "borrowed") {
+    await this.resourceService.updateResourceState(resourceId, state);
+  }
 
-    await this.resourceService.updateResourceState(book.getId(), "borrowed");
+  async loanBook(bookId: string, user: Student | Teacher) {
+    const book = await this.resourceService.findBook(bookId);
+    
+    if (!book || book.getState() !== "available") {
+      throw new Error("El libro no está disponible");
+    }
+  
+    // Calcular fechas de préstamo
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + 7); // Préstamo por 7 días
+  
+    await this.resourceService.updateResourceState(bookId, "borrowed");
+    
+    // Usar createLoan con las fechas calculadas
     await this.loanService.createLoan(
       book,
       user,
-      new Date(),
-      new Date(Date.now() + 1000 * 60 * 60 * 24 * 14)
+      startDate,
+      endDate
     );
   }
 

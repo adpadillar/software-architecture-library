@@ -79,15 +79,9 @@ export class ResourceService {
     return this.mapToResource(resource);
   }
 
-  async updateResourceState(
-    id: string,
-    state: "available" | "borrowed"
-  ): Promise<void> {
+  async updateResourceState(id: string, state: "available" | "borrowed"): Promise<void> {
     await this.initDb();
-    await this.db!.run("UPDATE resources SET state = ? WHERE id = ?", [
-      state,
-      id,
-    ]);
+    await this.db!.run("UPDATE resources SET state = ? WHERE id = ?", [state, id]);
   }
 
   async deleteResource(id: string): Promise<void> {
@@ -246,12 +240,21 @@ export class ResourceService {
       const book = await this.db!.get("SELECT * FROM books WHERE id = ?", [
         resource.id,
       ]);
-      return new Book(book.title, book.author, book.genre, book.state);
+      return new Book(
+        book.title,
+        book.author,
+        book.genre,
+        resource.state // Pasar el estado correctamente
+      );
     } else {
       const laptop = await this.db!.get("SELECT * FROM laptops WHERE id = ?", [
         resource.id,
       ]);
-      return new Laptop(laptop.brand, laptop.model, laptop.state);
+      return new Laptop(
+        laptop.brand,
+        laptop.model,
+        resource.state // Pasar el estado correctamente
+      );
     }
   }
 }

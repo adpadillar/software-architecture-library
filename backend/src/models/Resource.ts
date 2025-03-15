@@ -9,6 +9,11 @@ export class Resource {
     this.state = state;
   }
 
+  // Agregar este método
+  public getState(): State {
+    return this.state;
+  }
+
   public isAvailable(): boolean {
     return this.state === "available";
   }

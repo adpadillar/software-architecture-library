@@ -28,64 +28,37 @@ export default function ShowBooks({ searchCriteria }: ShowBooksProps) {
   // Función para prestar un libro (POST /loans/books)
   const handleBorrowBook = async (bookId: string) => {
     try {
-      // 1. Verificar disponibilidad en el frontend
-      const book = data?.find(b => b.id === bookId);
-      if (!book || book.state !== 'available') {
-        alert("El libro no está disponible");
-        return false;
-      }
-  
-      // 2. Realizar préstamo
-      const response = await fetch('http://localhost:3000/api/loans/books', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:3000/api/books/${bookId}/state`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token') // Si usas autenticación
         },
-        body: JSON.stringify({
-          bookId: bookId,
-          userId: "user-001",
-          userType: "student"
-        }),
+        body: JSON.stringify({ state: "borrowed" })
       });
   
-      // 3. Manejar respuesta
-      if (response.status === 400) {
-        const error = await response.json();
-        alert(error.message);
-        return false;
-      }
-  
-      if (!response.ok) throw new Error("Error en el servidor");
-  
+      if (!response.ok) throw new Error("Error al prestar libro");
       return true;
-  
     } catch (error) {
-      console.error("Error en préstamo:", error);
-      alert("Error al comunicarse con el servidor");
+      alert(error instanceof Error ? error.message : "Error desconocido");
       return false;
     }
   };
-
-  // Función para devolver un libro (POST /resources/:id/return)
+  
   const handleReturnBook = async (bookId: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/resources/${bookId}/return`, {
-        method: 'POST',
+      const response = await fetch(`http://localhost:3000/api/books/${bookId}/state`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ state: "available" })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al devolver el libro');
-      }
-
+  
+      if (!response.ok) throw new Error("Error al devolver libro");
       return true;
     } catch (error) {
-      console.error('Error:', error);
-      throw error; // Propagar el error
+      alert(error instanceof Error ? error.message : "Error desconocido");
+      return false;
     }
   };
 
