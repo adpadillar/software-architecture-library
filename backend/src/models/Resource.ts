@@ -4,9 +4,9 @@ export class Resource {
   private id: string;
   private state: State;
 
-  constructor() {
+  constructor(state: State) {
     this.id = crypto.randomUUID();
-    this.state = "available";
+    this.state = state;
   }
 
   public isAvailable(): boolean {
@@ -30,8 +30,8 @@ export class Laptop extends Resource {
   private brand: string;
   private model: string;
 
-  constructor(brand: string, model: string) {
-    super();
+  constructor(brand: string, model: string, state: State) {
+    super(state);
     this.brand = brand;
     this.model = model;
   }
@@ -50,8 +50,8 @@ export class Book extends Resource {
   private author: string;
   private genre: string;
 
-  constructor(title: string, author: string, genre: string) {
-    super();
+  constructor(title: string, author: string, genre: string, state: State) {
+    super(state);
     this.title = title;
     this.author = author;
     this.genre = genre;

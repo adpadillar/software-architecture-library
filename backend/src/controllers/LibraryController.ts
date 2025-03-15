@@ -33,7 +33,7 @@ export class LibraryController {
 
   // Book Management
   async addBook(title: string, author: string, genre: string): Promise<Book> {
-    const book = new Book(title, author, genre);
+    const book = new Book(title, author, genre, "available");
     await this.resourceService.addBook(book);
     return book;
   }
@@ -60,7 +60,7 @@ export class LibraryController {
 
   // Laptop Management
   async addLaptop(brand: string, model: string): Promise<Laptop> {
-    const laptop = new Laptop(brand, model);
+    const laptop = new Laptop(brand, model, "available");
     await this.resourceService.addLaptop(laptop);
     return laptop;
   }
